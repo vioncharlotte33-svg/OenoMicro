@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OœnoMicro v5 · Bibliothèque scientifique</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@400;500&display=swap');
+:root{
+  --bg:#F7F5F0;--surface:#FFF;--surface2:#F0EDE6;--border:#E2DDD5;--border-strong:#C8C0B4;
+  --text:#1A1714;--muted:#6B6560;--faint:#A09890;
+  --accent:#7B4F2E;--accent-bg:#F2EAE2;
+  --green:#2E5C4F;--green-bg:#E4EFEB;
+  --red:#C0392B;--red-bg:#FDECEA;
+  --amber:#B8680A;--amber-bg:#FEF3E2;
+  --teal:#1A6B72;--teal-bg:#E2F2F3;
+  --radius:8px;--radius-lg:12px;
+  --shadow:0 1px 4px rgba(0,0,0,.07);
+  --shadow-lg:0 4px 20px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;display:flex}
+/* SIDEBAR */
+.sidebar{width:236px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;z-index:10;overflow-y:auto;display:flex;flex-direction:column}
+.logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.logo-title{font-family:'Lora',serif;font-size:17px;font-weight:500;color:var(--accent)}
+.logo-sub{font-size:11px;color:var(--faint);margin-top:2px}
+.nav{padding:8px 6px;flex:1}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--faint);padding:8px 10px 4px}
+.nav-btn{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:12.5px;color:var(--muted);transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
+.nav-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.badge{margin-left:auto;color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.badge-accent{background:var(--accent)}
+.badge-amber{background:var(--amber);animation:pulse 2s infinite}
+.badge-red{background:var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.sidebar-footer{padding:10px 12px;border-top:1px solid var(--border);font-size:11px;color:var(--faint)}
+/* MAIN */
+.main{margin-left:236px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 22px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.page-title{font-family:'Lora',serif;font-size:16px;font-weight:500}
+.topbar-right{margin-left:auto;display:flex;gap:7px}
+.content{padding:22px;flex:1}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;font-size:13px;font-family:'Inter',sans-serif;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
+.btn-primary:hover{opacity:.88}
+.btn-success{background:var(--green);color:#fff;border-color:var(--green);font-weight:500}
+.btn-success:hover{opacity:.88}
+.btn-danger{background:var(--red-bg);color:var(--red);border-color:#F0B4AE}
+.btn-sm{padding:4px 9px;font-size:12px}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-ghost:hover{background:var(--bg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+/* INPUTS */
+.inp{width:100%;padding:7px 11px;font-size:13px;font-family:'Inter',sans-serif;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--faint)}
+.sel{padding:6px 9px;font-size:13px;font-family:'Inter',sans-serif;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;outline:none}
+input[type=file]{display:none}
+/* PANELS */
+.panel{display:none}.panel.active{display:block}
+/* STATS */
+.stats-grid{display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:11px 15px;flex:1;min-width:90px}
+.stat-lbl{font-size:11px;color:var(--faint);font-weight:500;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat-val.green{color:var(--green)}.stat-val.amber{color:var(--amber)}.stat-val.red{color:var(--red)}
+/* SEARCH BAR */
+.search-bar{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.result-count{font-size:12px;color:var(--faint);margin-bottom:10px}
+/* ARTICLE CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 17px;margin-bottom:7px;transition:border-color .15s,box-shadow .15s}
+.card:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
+.card-title-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start}
+.card-title{font-size:14px;font-weight:500;line-height:1.4;flex:1}
+.card-title a{color:inherit;text-decoration:none}
+.card-title a:hover{color:var(--accent);text-decoration:underline}
+.card-meta{font-size:12px;color:var(--muted);display:flex;align-items:center;flex-wrap:wrap;margin-bottom:8px;gap:2px}
+.meta-year{font-weight:600;color:var(--accent);margin-right:6px}
+.meta-authors{margin-right:6px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta-sep{margin:0 4px;color:var(--border-strong)}
+.meta-journal{font-style:italic}
+.meta-links{margin-left:auto;display:flex;gap:7px;align-items:center;flex-shrink:0}
+.card-abstract{font-size:12px;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:9px}
+.card-abstract.exp{-webkit-line-clamp:unset}
+.card-footer{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.expand-btn{font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;margin-left:4px}
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;font-size:11px;border-radius:20px;font-weight:500;white-space:nowrap}
+.tag-dot{width:6px;height:6px;border-radius:50%}
+.tag-remove{background:none;border:none;cursor:pointer;padding:0 0 0 2px;font-size:11px;line-height:1;opacity:.7}
+.tag-remove:hover{opacity:1}
+.cat-add{font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);cursor:pointer}
+/* PDF BUTTON */
+.pdf-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 8px;border-radius:var(--radius);background:var(--amber-bg);color:var(--amber);border:1px solid #F4CC8A;cursor:pointer;font-weight:500;font-family:'Inter',sans-serif}
+.pdf-btn:hover{background:#FAE5C0}
+.pdf-attach{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 8px;border-radius:var(--radius);background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:pointer;font-weight:500}
+/* ALERTS */
+.alert{padding:9px 13px;border-radius:var(--radius);font-size:13px;margin-bottom:11px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert-info{background:var(--teal-bg);color:var(--teal);border:1px solid #B5D8DA}
+.alert-success{background:var(--green-bg);color:var(--green);border:1px solid #B8D8CE}
+.alert-warn{background:var(--amber-bg);color:var(--amber);border:1px solid #F4CC8A}
+.alert-error{background:var(--red-bg);color:var(--red);border:1px solid #F0B4AE}
+/* EMPTY */
+.empty{text-align:center;padding:4rem 2rem;color:var(--faint)}
+.empty-icon{font-size:34px;margin-bottom:10px;opacity:.4}
+.empty-title{font-size:15px;color:var(--muted);font-weight:500;margin-bottom:5px}
+/* LOADING */
+.spin-wrap{display:flex;align-items:center;gap:10px;padding:18px;color:var(--muted);font-size:13px}
+.spin{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* VALIDATE CARD */
+.v-card{background:var(--surface);border:1px solid var(--amber);border-left:4px solid var(--amber);border-radius:var(--radius-lg);padding:13px 17px;margin-bottom:9px}
+.v-cats{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.cat-check{display:inline-flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--muted);transition:all .15s;user-select:none}
+.cat-check.on{color:#fff;font-weight:500;border-color:transparent}
+.cat-check input{display:none}
+.v-actions{display:flex;gap:7px;margin-top:9px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+/* DUP CARD */
+.dup-card{background:var(--surface);border:1px solid var(--red);border-left:4px solid var(--red);border-radius:var(--radius-lg);padding:13px 17px;margin-bottom:9px}
+.dup-entry{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:5px;display:flex;gap:10px;align-items:flex-start;background:var(--bg)}
+.dup-info{flex:1;min-width:0}
+.dup-title{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dup-meta{font-size:11px;color:var(--muted);margin-top:2px}
+/* WATCH */
+.watch-row{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px}
+.watch-info{flex:1}
+.watch-name{font-weight:500;font-size:13px}
+.watch-q{font-size:11px;color:var(--faint);font-family:monospace;margin-top:1px}
+.toggle{width:37px;height:21px;border-radius:11px;background:var(--border-strong);border:none;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';width:15px;height:15px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .2s}
+.toggle.on::after{left:19px}
+/* CAT MANAGER */
+.cat-row{display:flex;align-items:center;gap:7px;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:5px;cursor:grab}
+.cat-row-name{font-size:13px;font-weight:500;flex:1;min-width:0}
+.cat-row-kw{font-size:11px;color:var(--faint);flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-row-count{font-size:12px;color:var(--muted);min-width:40px;text-align:right}
+.swatch{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+/* EXPORT BLOCK */
+.ex-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px 19px;margin-bottom:11px}
+.ex-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.ex-desc{font-size:12px;color:var(--muted);margin-bottom:11px;line-height:1.6}
+/* DROP ZONE */
+.drop-zone{border:2px dashed var(--border-strong);border-radius:var(--radius-lg);padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface)}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:var(--accent-bg)}
+.fmt-badges{display:flex;gap:5px;justify-content:center;margin-top:9px;flex-wrap:wrap}
+.fmt{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-family:monospace}
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.45);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);padding:22px;max-width:600px;width:94%;box-shadow:var(--shadow-lg);max-height:92vh;overflow-y:auto}
+.modal-title{font-family:'Lora',serif;font-size:16px;font-weight:500;margin-bottom:13px}
+.modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:14px}
+.lbl{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;margin-top:11px;font-weight:500}
+.form-2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.sec-head{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+/* PDF VIEWER */
+.pdf-overlay{display:none;position:fixed;inset:0;background:rgba(26,23,20,.6);z-index:200;align-items:stretch;padding:16px}
+.pdf-overlay.open{display:flex}
+.pdf-wrap{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:980px;margin:auto;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);max-height:94vh}
+.pdf-top{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);flex-shrink:0;gap:10px;flex-wrap:wrap}
+.pdf-title{font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-controls{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.pdf-body{flex:1;overflow:auto;background:#444;display:flex;justify-content:center;padding:16px;min-height:60vh}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-title">OœnoMicro</div>
+    <div class="logo-sub">Veille · Microbiologie du vin · v5</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Bibliothèque</div>
+    <button class="nav-btn active" onclick="nav('biblio',this)">📚 Tous les articles<span class="badge badge-accent" id="nb-total">0</span></button>
+    <button class="nav-btn" onclick="nav('validate',this)">🔍 À valider<span class="badge badge-amber" id="nb-queue" style="display:none">0</span></button>
+    <button class="nav-btn" onclick="nav('duplicates',this)">⚠️ Doublons<span class="badge badge-red" id="nb-dup" style="display:none">0</span></button>
+    <div class="nav-label" style="margin-top:6px">Catégories</div>
+    <div id="nav-cats"></div>
+    <div class="nav-label" style="margin-top:6px">Outils</div>
+    <button class="nav-btn" onclick="nav('search',this)">🔍 Recherche PubMed</button>
+    <button class="nav-btn" onclick="nav('veille',this)">📡 Alertes veille</button>
+    <button class="nav-btn" onclick="nav('import',this)">📥 Importer</button>
+    <button class="nav-btn" onclick="openManual()">✏️ Ajouter manuellement</button>
+    <button class="nav-btn" onclick="nav('categories',this)">🏷️ Gérer catégories</button>
+    <button class="nav-btn" onclick="nav('export',this)">📤 Exporter</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div>OœnoMicro v5 · 23 catégories</div>
+    <div id="last-sync" style="margin-top:2px">Jamais synchronisé</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="page-title" id="page-title">Tous les articles</div>
+    <div class="topbar-right">
+      <button class="btn btn-sm" onclick="runVeille()" id="sync-btn">🔄 Actualiser veille</button>
+      <button class="btn btn-sm btn-primary" onclick="openManual()">+ Ajouter</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- BIBLIOTHÈQUE -->
+    <div class="panel active" id="panel-biblio">
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="search-bar">
+        <input type="text" class="inp" id="lib-q" placeholder="Rechercher titre, auteurs, mots-clés…" oninput="renderBiblio()" style="flex:2;width:auto">
+        <select class="sel" id="lib-cat" onchange="renderBiblio()"><option value="">Toutes catégories</option></select>
+        <select class="sel" id="lib-year" onchange="renderBiblio()"><option value="">Toutes années</option></select>
+        <select class="sel" id="lib-sort" onchange="renderBiblio()">
+          <option value="desc">Plus récents</option>
+          <option value="asc">Plus anciens</option>
+          <option value="title">Titre A→Z</option>
+        </select>
+      </div>
+      <div class="result-count" id="lib-count"></div>
+      <div id="biblio-list"></div>
+    </div>
+
+    <!-- À VALIDER -->
+    <div class="panel" id="panel-validate">
+      <div class="alert alert-warn">⏳ Vérifiez la classification. Les doublons potentiels avec votre bibliothèque sont signalés en rouge.</div>
+      <div style="display:flex;gap:7px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+        <span class="result-count" id="q-label" style="margin:0;flex:1"></span>
+        <button class="btn btn-sm btn-success" onclick="acceptAll()">✓ Tout accepter</button>
+        <button class="btn btn-sm btn-danger" onclick="rejectAll()">✕ Tout rejeter</button>
+      </div>
+      <div id="queue-list"></div>
+    </div>
+
+    <!-- DOUBLONS -->
+    <div class="panel" id="panel-duplicates">
+      <div class="alert alert-error">⚠️ Doublons détectés dans votre bibliothèque. Gardez-en un et supprimez l'autre.</div>
+      <div style="display:flex;gap:7px;margin-bottom:14px;align-items:center">
+        <span class="result-count" id="dup-label" style="margin:0;flex:1"></span>
+        <button class="btn btn-sm" onclick="detectDups();renderDups()">🔄 Relancer</button>
+      </div>
+      <div id="dup-list"></div>
+    </div>
+
+    <!-- PAR CATÉGORIE -->
+    <div class="panel" id="panel-cat"><div id="cat-content"></div></div>
+
+    <!-- RECHERCHE PUBMED -->
+    <div class="panel" id="panel-search">
+      <div class="alert alert-info">🔬 Les articles trouvés sont envoyés dans <strong>À valider</strong>.</div>
+      <div class="search-bar">
+        <input type="text" class="inp" id="pm-q" value="wine yeast nutrition fermentation" style="flex:2;width:auto">
+        <select class="sel" id="pm-years">
+          <option value="1">12 mois</option><option value="2" selected>2 ans</option>
+          <option value="5">5 ans</option><option value="10">10 ans</option><option value="30">Tout</option>
+        </select>
+        <button class="btn btn-primary" onclick="doPubmed()">🔍 Rechercher</button>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="sec-head">Requêtes prédéfinies</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="setQ('wine yeast nitrogen nutrition fermentation')">Nutrition azotée</button>
+          <button class="btn btn-sm" onclick="setQ('active dry yeast rehydration wine sterol membrane')">Réhydratation</button>
+          <button class="btn btn-sm" onclick="setQ('hydrogen sulfide wine yeast sulfur metabolism')">Soufre/H₂S</button>
+          <button class="btn btn-sm" onclick="setQ('varietal thiol wine yeast 3-MH 4-MMP')">Thiols</button>
+          <button class="btn btn-sm" onclick="setQ('malolactic fermentation Oenococcus wine')">FML</button>
+          <button class="btn btn-sm" onclick="setQ('Brettanomyces wine 4-ethylphenol')">Brett</button>
+          <button class="btn btn-sm" onclick="setQ('non-Saccharomyces wine fermentation')">Non-Sacch.</button>
+          <button class="btn btn-sm" onclick="setQ('wine acidification biological Lachancea')">Acidification</button>
+          <button class="btn btn-sm" onclick="setQ('bioprotection wine antifungal killer toxin')">Bioprotection</button>
+          <button class="btn btn-sm" onclick="setQ('wine tannin polyphenol anthocyanin')">Tanins</button>
+          <button class="btn btn-sm" onclick="setQ('wine oxidation SO2 antioxidant stability')">Oxydation</button>
+          <button class="btn btn-sm" onclick="setQ('wine aging bottle evolution maturation')">Vieillissement</button>
+          <button class="btn btn-sm" onclick="setQ('yeast derivative autolysis mannoproteins lees wine')">Dérivés levures</button>
+          <button class="btn btn-sm" onclick="setQ('wine dealcoholization alcohol reduction')">Désalcoolisation</button>
+          <button class="btn btn-sm" onclick="setQ('grapevine climate change berry composition viticulture')">Vigne & climat</button>
+          <button class="btn btn-sm" onclick="setQ('sparkling wine champagne secondary fermentation tirage autolysis')">Sparkling</button>
+          <button class="btn btn-sm" onclick="setQ('Saccharomyces cerevisiae metabolism glycolysis carbon physiology')">Métabolisme levure</button>
+        </div>
+      </div>
+      <div id="pm-results"></div>
+    </div>
+
+    <!-- VEILLE -->
+    <div class="panel" id="panel-veille">
+      <div class="alert alert-info">📡 Nouveaux articles → <strong>À valider</strong>. Articles rejetés mémorisés pour ne plus être reproposés.</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+        <div class="sec-head" style="margin:0">Alertes configurées</div>
+        <button class="btn btn-sm" onclick="openAddWatch()">+ Ajouter</button>
+      </div>
+      <div id="watches-list"></div>
+      <div class="divider"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:13px;font-weight:500">Articles définitivement rejetés</div>
+          <div style="font-size:12px;color:var(--faint);margin-top:2px" id="rejected-count">Liste noire vide.</div>
+        </div>
+        <button class="btn btn-sm btn-ghost" onclick="clearRejected()" style="color:var(--red)">🗑 Vider la liste noire</button>
+      </div>
+    </div>
+
+    <!-- IMPORT -->
+    <div class="panel" id="panel-import">
+      <div class="alert alert-info">📥 Glissez BibTeX, RIS ou PDF. Les doublons avec votre bibliothèque sont signalés dans <strong>À valider</strong>.</div>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('any-file').click()" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+        <div style="font-size:30px;margin-bottom:7px">📂</div>
+        <div style="font-size:14px;font-weight:500;margin-bottom:4px">Glissez vos fichiers ici ou cliquez</div>
+        <div style="font-size:12px;color:var(--faint)">BibTeX, RIS, PDF — un ou plusieurs à la fois</div>
+        <div class="fmt-badges"><span class="fmt">.bib</span><span class="fmt">.ris</span><span class="fmt">.pdf</span><span class="fmt">.json</span></div>
+      </div>
+      <input type="file" id="any-file" accept=".bib,.ris,.txt,.json,.pdf" multiple onchange="handleFiles(Array.from(event.target.files))">
+      <div id="pdf-progress" style="display:none;margin-top:10px"></div>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div class="ex-block">
+          <div class="ex-title">📖 BibTeX (.bib)</div>
+          <div class="ex-desc">Mendeley, Zotero, Google Scholar, EndNote…</div>
+          <button class="btn" onclick="document.getElementById('bib-file').click()">📂 Charger .bib</button>
+          <input type="file" id="bib-file" accept=".bib,.txt" onchange="handleFiles([event.target.files[0]])">
+        </div>
+        <div class="ex-block">
+          <div class="ex-title">📋 RIS (.ris)</div>
+          <div class="ex-desc">Web of Science, Scopus, PubMed, EndNote…</div>
+          <button class="btn" onclick="document.getElementById('ris-file').click()">📂 Charger .ris</button>
+          <input type="file" id="ris-file" accept=".ris,.txt" onchange="handleFiles([event.target.files[0]])">
+        </div>
+      </div>
+      <div class="ex-block">
+        <div class="ex-title">💾 Restaurer une sauvegarde</div>
+        <div class="ex-desc">Rechargez un backup.json OœnoMicro.</div>
+        <button class="btn" onclick="document.getElementById('json-file').click()">📂 Charger backup.json</button>
+        <input type="file" id="json-file" accept=".json" onchange="importJSON(event)">
+        <div id="json-status" style="font-size:12px;margin-top:5px;color:var(--green)"></div>
+      </div>
+    </div>
+
+    <!-- CATÉGORIES -->
+    <div class="panel" id="panel-categories">
+      <div class="alert alert-info">⠿ Glissez pour réorganiser · ✏️ Modifier nom/couleur/mots-clés · ↑↓ Déplacer</div>
+      <div id="cats-mgr"></div>
+      <div class="divider"></div>
+      <div class="sec-head">Créer une catégorie</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:flex-start">
+        <input type="text" class="inp" id="new-cat-name" placeholder="Nom" style="flex:1;min-width:130px;width:auto">
+        <input type="text" class="inp" id="new-cat-kw" placeholder="Mots-clés séparés par virgule (anglais)" style="flex:2;min-width:180px;width:auto">
+        <select class="sel" id="new-cat-color">
+          <option value="#2E5C4F">Vert</option><option value="#1A6B72">Teal</option>
+          <option value="#7B4F2E">Brun</option><option value="#1E5FA6">Bleu</option>
+          <option value="#B8680A">Ambre</option><option value="#5B3D8C">Violet</option>
+          <option value="#C0392B">Rouge</option><option value="#6B6560">Gris</option>
+          <option value="#A0522D">Rouille</option><option value="#2E7D6B">Émeraude</option>
+          <option value="#336B87">Ardoise</option><option value="#8E3A59">Bordeaux</option>
+          <option value="#1A5C3F">Forêt</option><option value="#8B6914">Or</option>
+        </select>
+        <button class="btn btn-primary" onclick="addCat()">Créer</button>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="panel" id="panel-export">
+      <div class="ex-block">
+        <div class="ex-title">📖 BibTeX — Mendeley / Zotero / EndNote</div>
+        <div class="ex-desc">Format universel pour tout gestionnaire bibliographique.</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <select class="sel" id="exp-bib-cat"><option value="">Toutes catégories</option></select>
+          <button class="btn btn-primary" onclick="exportBib()">⬇ Télécharger .bib</button>
+        </div>
+      </div>
+      <div class="ex-block">
+        <div class="ex-title">📊 CSV — Excel / Google Sheets</div>
+        <div class="ex-desc">Tableau structuré, une ligne par article.</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <select class="sel" id="exp-csv-cat"><option value="">Toutes catégories</option></select>
+          <button class="btn" onclick="exportCSV()">⬇ Télécharger .csv</button>
+        </div>
+      </div>
+      <div class="ex-block">
+        <div class="ex-title">💾 Sauvegarde complète (.json)</div>
+        <div class="ex-desc">Articles + catégories + alertes. À faire régulièrement.</div>
+        <button class="btn" onclick="exportJSON()">⬇ Télécharger backup.json</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- PDF VIEWER -->
+<div class="pdf-overlay" id="pdf-overlay" onclick="if(event.target===this)closePdf()">
+  <div class="pdf-wrap">
+    <div class="pdf-top">
+      <div class="pdf-title" id="pdf-title">PDF</div>
+      <div class="pdf-controls">
+        <button class="btn btn-sm btn-ghost" onclick="pdfPage(-1)">◀</button>
+        <span id="pdf-pages" style="font-size:12px;color:var(--muted);white-space:nowrap">1 / 1</span>
+        <button class="btn btn-sm btn-ghost" onclick="pdfPage(1)">▶</button>
+        <button class="btn btn-sm btn-ghost" onclick="pdfZoom(-0.25)">−</button>
+        <button class="btn btn-sm btn-ghost" onclick="pdfZoom(0.25)">+</button>
+        <a id="pdf-dl" href="#" class="btn btn-sm">⬇</a>
+        <button class="btn btn-sm btn-ghost" onclick="closePdf()">✕</button>
+      </div>
+    </div>
+    <div class="pdf-body" id="pdf-body">
+      <div id="pdf-msg" style="color:#fff;align-self:center;font-size:13px">Chargement…</div>
+      <canvas id="pdf-canvas" style="display:none;box-shadow:0 2px 12px rgba(0,0,0,.5)"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Ajout / Édition article -->
+<div class="overlay" id="modal-article">
+  <div class="modal">
+    <div class="modal-title" id="art-modal-title">✏️ Ajouter une référence</div>
+    <input type="hidden" id="art-id">
+    <label class="lbl">Titre *</label>
+    <input type="text" class="inp" id="art-title" placeholder="Titre de l'article">
+    <div class="form-2" style="margin-top:9px">
+      <div><label class="lbl">Auteurs</label><input type="text" class="inp" id="art-authors" placeholder="Dupont A, Martin B"></div>
+      <div><label class="lbl">Année</label><input type="number" class="inp" id="art-year" placeholder="2024"></div>
+      <div><label class="lbl">Journal</label><input type="text" class="inp" id="art-journal" placeholder="Food Microbiology"></div>
+      <div><label class="lbl">DOI</label><input type="text" class="inp" id="art-doi" placeholder="10.1016/j.fm.2024.001"></div>
+    </div>
+    <label class="lbl">PDF (optionnel)</label>
+    <div style="display:flex;gap:7px;align-items:center">
+      <input type="text" class="inp" id="art-pdf-url" placeholder="URL ou lien vers le PDF" style="flex:1">
+      <button class="btn btn-sm" onclick="document.getElementById('art-pdf-file').click()">📂 Parcourir</button>
+      <input type="file" id="art-pdf-file" accept=".pdf" onchange="handleArtPdf(event)">
+    </div>
+    <div id="art-pdf-info" style="font-size:11px;color:var(--green);margin-top:4px"></div>
+    <label class="lbl">Résumé</label>
+    <textarea class="inp" id="art-abstract" style="min-height:70px;resize:vertical"></textarea>
+    <label class="lbl">Mots-clés</label>
+    <input type="text" class="inp" id="art-keywords" placeholder="wine, yeast, nitrogen…">
+    <label class="lbl">Catégories</label>
+    <div id="art-cats" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px"></div>
+    <div style="margin-top:7px"><button class="btn btn-sm" onclick="autoClassifyModal()">🤖 Classer automatiquement</button></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeOverlay('modal-article')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveArticleModal()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Alerte veille -->
+<div class="overlay" id="modal-watch">
+  <div class="modal">
+    <div class="modal-title">Nouvelle alerte de veille</div>
+    <label class="lbl">Nom</label>
+    <input type="text" class="inp" id="w-name" placeholder="Ex: Stress thermique levures">
+    <label class="lbl" style="margin-top:9px">Requête PubMed (anglais)</label>
+    <input type="text" class="inp" id="w-query" placeholder="Ex: wine yeast heat stress tolerance">
+    <div class="modal-footer">
+      <button class="btn" onclick="closeOverlay('modal-watch')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveWatch()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ════════════════════════════════
+// 23 CATÉGORIES
+// ════════════════════════════════
+const CATS=[
+ {id:'c01',name:'Nutrition azotée des levures',color:'#2E5C4F',kw:['nitrogen','yeast assimilable nitrogen','YAN','ammonium','amino acid','DAP','diammonium phosphate','arginine','proline','glutamine','asparagine','nitrogen deficiency','nitrogen source','nitrogen metabolism','yeast nutrition']},
+ {id:'c02',name:'Nutrition non azotée & vitamines',color:'#1A6B72',kw:['thiamine','pantothenic acid','biotin','vitamin','mineral','zinc','magnesium','manganese','iron','copper','phosphate','sulfate','micronutrient','cofactor','yeast nutrient']},
+ {id:'c03',name:'Réhydratation des levures sèches actives',color:'#7B4F2E',kw:['rehydration','active dry yeast','ADY','dried yeast','rehydrate','survival','viability','membrane integrity','trehalose','acclimatization','inoculation','starter culture','sterol','ergosterol','unsaturated fatty acid','UFA','membrane lipid','plasma membrane','lipid composition','oleic acid','linoleic acid','anaerobic growth factor','membrane fluidity rehydration','oxygenation must']},
+ {id:'c04',name:'Cinétique & performance fermentaire',color:'#1E5FA6',kw:['fermentation kinetics','stuck fermentation','sluggish fermentation','fermentation rate','glucose','fructose','sugar consumption','ethanol production','glycerol','volatile acidity','fermentation performance','alcoholic fermentation']},
+ {id:'c05',name:'Composés aromatiques — esters & alcools',color:'#B8680A',kw:['ester','isoamyl acetate','ethyl acetate','2-phenylethanol','higher alcohol','fusel','isobutanol','propanol','aroma','volatile','flavor','flavour','fruity','floral','aromatic compound']},
+ {id:'c06',name:'Thiols variétaux & composés soufrés aromatiques',color:'#5B3D8C',kw:['thiol','4-mercapto-4-methyl-pentan-2-one','4-MMP','3-mercaptohexanol','3-MH','furfurylthiol','varietal thiol','precursor','cysteine conjugate','glutathione conjugate','beta-lyase','sulfhydryl']},
+ {id:'c07',name:'Métabolisme du soufre & H₂S',color:'#C0392B',kw:['sulfur metabolism','hydrogen sulfide','H2S','sulfite','SO2','methionine','cysteine','homocysteine','reductive','off-flavor','sulfur dioxide','bisulfite','reductive note','sulfur off-flavor']},
+ {id:'c08',name:'Stress & tolérance des levures',color:'#6B6560',kw:['oxidative stress','ethanol stress','osmotic stress','heat stress','cold stress','temperature adaptation','tolerance','HSP','heat shock protein','reactive oxygen species','ROS','membrane fluidity stress','trehalose stress','survival stress']},
+ {id:'c09',name:'Bactéries lactiques & fermentation malolactique',color:'#1A5C3F',kw:['lactic acid bacteria','LAB','Oenococcus oeni','Lactobacillus','Pediococcus','malolactic fermentation','MLF','malic acid','lactic acid','co-inoculation','sequential inoculation','bacteriocin','FML']},
+ {id:'c10',name:'Brettanomyces & altérations microbiennes',color:'#8B6914',kw:['Brettanomyces','Dekkera','4-ethylphenol','4-EP','4-ethylguaiacol','4-EG','vinylphenol','spoilage','contamination','wine spoilage','Acetobacter','acetic acid bacteria']},
+ {id:'c11',name:'Levures non-Saccharomyces',color:'#336B87',kw:['non-Saccharomyces','Torulaspora delbrueckii','Lachancea thermotolerans','Metschnikowia pulcherrima','Starmerella bacillaris','Hanseniaspora','Candida stellata','Pichia kluyveri','Kluyveromyces','sequential fermentation','mixed fermentation','wild yeast','indigenous yeast']},
+ {id:'c12',name:'Acidification biologique & gestion de l\'acidité',color:'#A0522D',kw:['acidification','biological acidification','malic acid production','lactic acid production','titratable acidity','pH wine','acid management','Lachancea thermotolerans acidification','acidification yeast','deacidification','acid balance wine','tartaric acid']},
+ {id:'c13',name:'Bioprotection & antagonisme microbien',color:'#2E7D6B',kw:['bioprotection','biocontrol','antifungal','antimicrobial','killer toxin','mycocin','competition','microbial antagonism','protective culture','wine bioprotection','non-Saccharomyces bioprotection','SO2 alternative','sulfite alternative']},
+ {id:'c14',name:'Procédés & itinéraires techniques de vinification',color:'#1A6B72',kw:['winemaking process','maceration','pressing','must clarification','settling','cold soak','pre-fermentation','barrel aging','elevage','oak aging','must extraction','temperature control fermentation','tank management','winemaking technique','crush','destemming','skin contact']},
+ {id:'c15',name:'Méthodologies omiques & biologie systémique',color:'#5B3D8C',kw:['genomics','transcriptomics','transcriptome','RNA-seq','proteomics','metabolomics','lipidomics','metabolome','metabolic profiling','lipid profiling','multi-omics','systems biology','genome sequencing','gene expression','QTL','SNP','CRISPR','mass spectrometry profiling','LC-MS','GC-MS metabolomics','metabolic signature']},
+ {id:'c16',name:'Vigne, terroir & changement climatique',color:'#4A7C9E',kw:['grapevine','vine','Vitis vinifera','terroir','climate change','global warming','temperature increase','drought stress vine','berry composition','grape variety','cultivar','phenology','ripening','vintage','canopy management','viticulture']},
+ {id:'c17',name:'Tanins, polyphénols & structure du vin',color:'#8E3A59',kw:['tannin','polyphenol','anthocyanin','flavonoid','procyanidin','condensed tannin','hydrolysable tannin','phenolic','polymerization','copigmentation','astringency','bitterness','color wine','resveratrol','stilbene','phenolic extraction']},
+ {id:'c18',name:'Oxydation, réduction & stabilité chimique',color:'#6B6560',kw:['oxidation','reduction','redox','dissolved oxygen','SO2','sulfur dioxide','antioxidant','wine stability','browning','quinone','acetaldehyde','oxygen transfer','closure','bottling','reductive off-flavor','oxidative spoilage']},
+ {id:'c19',name:'Vieillissement & évolution des vins',color:'#7B4F2E',kw:['wine aging','wine ageing','bottle aging','bottle evolution','Maillard reaction','wine maturation','esterification aging','aging potential','vertical tasting','wine storage','barrel maturation','wine development']},
+ {id:'c20',name:'Dérivés de levures & autolysats',color:'#2E5C4F',kw:['yeast derivative','yeast extract','autolysis','mannoproteins','yeast hulls','yeast lees','glutathione','lees aging','sur lie','yeast cell wall','beta-glucan','inactivated yeast','yeast preparation','yeast polysaccharide']},
+ {id:'c21',name:'Désalcoolisation & procédés alternatifs',color:'#1A6B72',kw:['dealcoholization','alcohol reduction','low alcohol wine','spinning cone column','reverse osmosis','nanofiltration','evaporative perstraction','alcohol management wine','reduced alcohol','partial dealcoholization','osmotic distillation','vacuum distillation wine']},
+ {id:'c22',name:'Métabolisme & physiologie de la levure',color:'#336B87',kw:['yeast metabolism','Saccharomyces cerevisiae physiology','carbon metabolism','glycolysis','TCA cycle','pentose phosphate pathway','redox balance','NADH','ATP production','acetyl-CoA','pyruvate','acetaldehyde metabolism','amino acid biosynthesis','cell growth yeast','yeast physiology','metabolic flux','central carbon metabolism','fermentative metabolism']},
+ {id:'c23',name:'Vins effervescents & boissons pétillantes',color:'#4A7C9E',kw:['sparkling wine','champagne','méthode champenoise','traditional method','secondary fermentation','tirage','disgorgement','riddling','remuage','lees aging sparkling','prise de mousse','Charmat method','tank method','cuve close','pétillant naturel','pet-nat','sparkling wine yeast','autolysis sparkling','mannoproteins sparkling','foam stability','bubble','nucleation','CO2 sparkling','base wine','cuvée','assemblage','Prosecco','Glera','Cava','gushing','dosage','brut','zero dosage','sparkling beverage','carbonated wine','effervescent beverage']}
+];
+
+const DEFAULT_WATCHES=[
+ {id:'w01',name:'Nutrition azotée levures',q:'wine yeast nitrogen metabolism fermentation',on:true},
+ {id:'w02',name:'Réhydratation LSA',q:'active dry yeast rehydration wine fermentation sterol membrane',on:true},
+ {id:'w03',name:'Thiols variétaux',q:'varietal thiol 3-mercaptohexanol 4-MMP wine yeast',on:true},
+ {id:'w04',name:'Métabolisme soufre H2S',q:'hydrogen sulfide wine yeast sulfur metabolism',on:true},
+ {id:'w05',name:'Fermentation malolactique',q:'malolactic fermentation Oenococcus oeni wine',on:true},
+ {id:'w06',name:'Acidification biologique',q:'biological acidification wine yeast Lachancea thermotolerans',on:true},
+ {id:'w07',name:'Bioprotection',q:'bioprotection wine non-Saccharomyces antifungal killer toxin',on:true},
+ {id:'w08',name:'Tanins & polyphénols',q:'wine tannin polyphenol anthocyanin polymerization',on:false},
+ {id:'w09',name:'Vieillissement des vins',q:'wine aging bottle evolution maturation esterification',on:false},
+ {id:'w10',name:'Dérivés de levures',q:'yeast derivative autolysis mannoproteins lees wine glutathione',on:false},
+ {id:'w11',name:'Désalcoolisation',q:'wine dealcoholization alcohol reduction spinning cone',on:false},
+ {id:'w12',name:'Vigne & climat',q:'grapevine climate change global warming berry composition viticulture',on:false},
+ {id:'w13',name:'Brettanomyces',q:'Brettanomyces Dekkera wine 4-ethylphenol spoilage',on:false},
+ {id:'w14',name:'Non-Saccharomyces',q:'non-Saccharomyces wine fermentation mixed',on:false},
+ {id:'w15',name:'Omiques & vin',q:'wine fermentation metabolomics lipidomics transcriptomics',on:false},
+ {id:'w16',name:'Métabolisme & physiologie levure',q:'Saccharomyces cerevisiae metabolism physiology glycolysis carbon fermentation',on:false},
+ {id:'w17',name:'Vins effervescents',q:'sparkling wine champagne secondary fermentation tirage autolysis foam',on:false}
+];
+
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+const STORE='oenomicro_v5';
+function loadState(){
+  try{
+    // Try current key first
+    let s=localStorage.getItem(STORE);
+    if(!s){
+      // Migrate from older versions
+      for(const k of['oenomicro_v4','oenomicro_v3','oenomicro_v2','oenomicro_v1']){
+        s=localStorage.getItem(k);if(s)break;
+      }
+    }
+    if(s){
+      const p=JSON.parse(s);
+      p.queue=p.queue||[];p.rejected=p.rejected||[];
+      // Always use latest categories definition
+      if(!p.categories||p.categories.length<23)p.categories=CATS.map(c=>({...c}));
+      if(!p.watches||p.watches.length<10)p.watches=DEFAULT_WATCHES.map(w=>({...w}));
+      return p;
+    }
+  }catch(e){}
+  return{articles:[],queue:[],rejected:[],categories:CATS.map(c=>({...c})),watches:DEFAULT_WATCHES.map(w=>({...w})),lastSync:null};
+}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){}}
+let S=loadState();
+let _editCatId=null,_dragCatId=null;
+let _pdfDoc=null,_pdfPage=1,_pdfZoom=1.2;
+let _artPdfUrl=null;
+
+// ════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════
+function nav(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  const T={biblio:'Tous les articles',validate:'À valider',duplicates:'Doublons',search:'Recherche PubMed',veille:'Alertes de veille',import:'Importer',categories:'Gérer les catégories',export:'Exporter'};
+  document.getElementById('page-title').textContent=T[id]||id;
+  if(id==='biblio')renderBiblio();
+  if(id==='validate'){S.queue.forEach(a=>{const d=dupWith(a);a._dup=d?d.title:null;});renderQueue();}
+  if(id==='duplicates'){detectDups();renderDups();}
+  if(id==='categories')renderCats();
+  if(id==='veille')renderWatches();
+  if(id==='export')fillExportSelects();
+}
+function navCat(catId,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const cat=S.categories.find(c=>c.id===catId);
+  document.getElementById('page-title').textContent=cat?cat.name:'Catégorie';
+  document.getElementById('panel-cat').classList.add('active');
+  renderCatPanel(catId);
+}
+
+// ════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════
+function renderSidebar(){
+  const counts=getCatCounts();
+  document.getElementById('nb-total').textContent=S.articles.length;
+  const qn=S.queue.length;
+  const qb=document.getElementById('nb-queue');qb.style.display=qn?'':'none';qb.textContent=qn;
+  detectDups();
+  const dn=_dupGroups.length;
+  const db=document.getElementById('nb-dup');db.style.display=dn?'':'none';db.textContent=dn;
+  if(S.lastSync)document.getElementById('last-sync').textContent='Veille: '+S.lastSync;
+  const rc=document.getElementById('rejected-count');
+  if(rc)rc.textContent=S.rejected.length>0?`${S.rejected.length} article(s) dans la liste noire.`:'Liste noire vide.';
+  document.getElementById('nav-cats').innerHTML=S.categories.map(cat=>`
+    <button class="nav-btn" onclick="navCat('${cat.id}',this)">
+      <span class="nav-dot" style="background:${cat.color}"></span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px">${cat.name}</span>
+      <span style="font-size:11px;color:var(--faint)">${counts[cat.id]||0}</span>
+    </button>`).join('');
+}
+function getCatCounts(){
+  const c={};S.categories.forEach(cat=>c[cat.id]=0);
+  S.articles.forEach(a=>(a.cats||[]).forEach(cid=>{if(c[cid]!==undefined)c[cid]++;}));
+  return c;
+}
+
+// ════════════════════════════════
+// CLASSIFICATION
+// ════════════════════════════════
+function classify(art){
+  const hay=((art.title||'')+(art.abstract||'')+(art.keywords||'')).toLowerCase();
+  return S.categories.map(cat=>({id:cat.id,score:(cat.kw||cat.keywords||[]).filter(kw=>hay.includes(kw.toLowerCase())).length})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,4).map(x=>x.id);
+}
+
+// ════════════════════════════════
+// DOUBLONS
+// ════════════════════════════════
+let _dupGroups=[];
+function norm(s){return(s||'').toLowerCase().replace(/[^a-z0-9]/g,'').trim();}
+function sim(a,b){
+  if(a===b)return 1;
+  const lo=a.length>b.length?a:b,sh=a.length>b.length?b:a;
+  if(!lo.length)return 1;
+  const c=[];
+  for(let i=0;i<=lo.length;i++){let lv=i;for(let j=0;j<=sh.length;j++){if(i===0)c[j]=j;else if(j>0){let nv=c[j-1];if(lo[i-1]!==sh[j-1])nv=Math.min(Math.min(nv,lv),c[j])+1;c[j-1]=lv;lv=nv;}}if(i>0)c[sh.length]=lv;}
+  return(lo.length-c[sh.length])/lo.length;
+}
+function dupWith(a){
+  const pmid=a.pmid?norm(a.pmid):'';const doi=a.doi?norm(a.doi):'';const title=norm(a.title);
+  return S.articles.find(b=>{
+    if(pmid&&b.pmid&&norm(b.pmid)===pmid)return true;
+    if(doi&&b.doi&&norm(b.doi)===doi)return true;
+    if(title.length>20&&norm(b.title).length>20&&sim(title,norm(b.title))>0.88)return true;
+    return false;
+  })||null;
+}
+function detectDups(){
+  _dupGroups=[];const arts=S.articles;const used=new Set();
+  for(let i=0;i<arts.length;i++){
+    if(used.has(arts[i].id))continue;
+    const g=[arts[i]];const tA=norm(arts[i].title);const dA=arts[i].doi?norm(arts[i].doi):'';
+    for(let j=i+1;j<arts.length;j++){
+      if(used.has(arts[j].id))continue;
+      const tB=norm(arts[j].title);const dB=arts[j].doi?norm(arts[j].doi):'';
+      if((dA&&dB&&dA===dB)||(tA.length>20&&tB.length>20&&sim(tA,tB)>0.88)){g.push(arts[j]);used.add(arts[j].id);}
+    }
+    if(g.length>1){used.add(arts[i].id);_dupGroups.push(g);}
+  }
+}
+function renderDups(){
+  const tot=_dupGroups.reduce((s,g)=>s+g.length,0);
+  document.getElementById('dup-label').textContent=_dupGroups.length?`${_dupGroups.length} groupe(s) — ${tot} articles`:'Aucun doublon.';
+  if(!_dupGroups.length){document.getElementById('dup-list').innerHTML=`<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Aucun doublon</div></div>`;return;}
+  document.getElementById('dup-list').innerHTML=_dupGroups.map((g,gi)=>`
+    <div class="dup-card">
+      <div style="font-size:11px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚠️ ${g.length} entrées similaires</div>
+      ${g.map((a,ai)=>`
+        <div class="dup-entry">
+          <div class="dup-info">
+            <div class="dup-title">${a.title}</div>
+            <div class="dup-meta">${a.year?`<strong>${a.year}</strong> · `:''}${a.authors||''}${a.doi?` · ${a.doi}`:''}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+            <button class="btn btn-sm btn-success" onclick="keepOne(${gi},${ai})">✓ Garder</button>
+            <button class="btn btn-sm btn-danger" onclick="delArt('${a.id}');detectDups();renderDups();renderSidebar()">🗑</button>
+          </div>
+        </div>`).join('')}
+      <div style="text-align:right;margin-top:6px"><button class="btn btn-sm btn-ghost" onclick="_dupGroups.splice(${gi},1);renderDups()" style="font-size:11px;color:var(--faint)">Ignorer</button></div>
+    </div>`).join('');
+}
+function keepOne(gi,ai){const g=_dupGroups[gi];g.forEach((a,i)=>{if(i!==ai)delArtQ(a.id);});detectDups();renderDups();renderSidebar();}
+function delArtQ(id){S.articles=S.articles.filter(x=>x.id!==id);save();}
+function delArt(id){delArtQ(id);renderBiblio();renderSidebar();}
+
+// ════════════════════════════════
+// ARTICLE TAG (avec ✕ retirable)
+// ════════════════════════════════
+function tagHTML(catId,artId){
+  const cat=S.categories.find(c=>c.id===catId);if(!cat)return'';
+  const rm=artId?`<button class="tag-remove" onclick="removeCat('${artId}','${catId}')" style="color:${cat.color}">✕</button>`:'';
+  return`<span class="tag" style="background:${cat.color}18;color:${cat.color};border:1px solid ${cat.color}40"><span class="tag-dot" style="background:${cat.color}"></span>${cat.name}${rm}</span>`;
+}
+function removeCat(artId,catId){
+  const a=S.articles.find(x=>x.id===artId);
+  if(a){a.cats=(a.cats||[]).filter(c=>c!==catId);save();renderBiblio();renderSidebar();}
+}
+
+// ════════════════════════════════
+// ARTICLE CARD
+// ════════════════════════════════
+function cardHTML(a){
+  const pdfBtn=a.pdfUrl
+    ?`<button class="pdf-btn" onclick="openPdf('${a.pdfUrl.replace(/'/g,"\\'")}','${(a.title||'').replace(/'/g,"\\'").slice(0,60)}')">📄 PDF</button>`
+    :`<label class="pdf-attach"><input type="file" accept=".pdf" onchange="attachPdf('${a.id}',this)">📎 PDF</label>`;
+  return`<div class="card" id="card-${a.id}">
+    <div class="card-title-row">
+      <div class="card-title">${a.doi?`<a href="https://doi.org/${a.doi}" target="_blank">${a.title}</a>`:a.title}</div>
+      <button class="btn btn-sm btn-ghost" onclick="openEdit('${a.id}')" title="Modifier">✏️</button>
+    </div>
+    <div class="card-meta">
+      ${a.year?`<span class="meta-year">${a.year}</span><span class="meta-sep">·</span>`:''}
+      ${a.authors?`<span class="meta-authors" title="${a.authors}">${a.authors}</span>`:''}
+      ${a.journal?`<span class="meta-sep">·</span><span class="meta-journal">${a.journal}</span>`:''}
+      <span class="meta-links">
+        ${pdfBtn}
+        ${a.pmid?`<a href="https://pubmed.ncbi.nlm.nih.gov/${a.pmid}/" target="_blank" style="color:var(--accent);font-size:11px">PubMed↗</a>`:''}
+        ${a.doi&&!a.pmid?`<a href="https://doi.org/${a.doi}" target="_blank" style="color:var(--accent);font-size:11px">DOI↗</a>`:''}
+      </span>
+    </div>
+    ${a.abstract?`<div class="card-abstract" id="abs-${a.id}">${a.abstract}<button class="expand-btn" onclick="toggleAbs('${a.id}')">+ voir</button></div>`:''}
+    <div class="card-footer">
+      ${(a.cats||[]).map(c=>tagHTML(c,a.id)).join('')}
+      <span style="margin-left:auto;display:flex;gap:5px;align-items:center">
+        <select class="cat-add" onchange="addCatToArt('${a.id}',this.value)">
+          <option value="">+ Catégorie</option>
+          ${S.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+        </select>
+        <button class="btn btn-sm btn-ghost" onclick="delArt('${a.id}')" style="color:var(--red)">🗑</button>
+      </span>
+    </div>
+  </div>`;
+}
+function toggleAbs(id){const el=document.getElementById('abs-'+id);const btn=el.querySelector('.expand-btn');el.classList.toggle('exp');btn.textContent=el.classList.contains('exp')?'− réduire':'+ voir';}
+function addCatToArt(artId,catId){
+  if(!catId)return;const a=S.articles.find(x=>x.id===artId);
+  if(a){if(!a.cats)a.cats=[];if(!a.cats.includes(catId))a.cats.push(catId);save();renderBiblio();renderSidebar();}
+}
+function attachPdf(artId,input){
+  const f=input.files[0];if(!f)return;
+  const a=S.articles.find(x=>x.id===artId);
+  if(a){a.pdfUrl=URL.createObjectURL(f);save();renderBiblio();}
+}
+
+// ════════════════════════════════
+// BIBLIOTHÈQUE
+// ════════════════════════════════
+function renderStats(){
+  detectDups();
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-box"><div class="stat-lbl">Articles total</div><div class="stat-val">${S.articles.length}</div></div>
+    <div class="stat-box"><div class="stat-lbl">À valider</div><div class="stat-val ${S.queue.length?'amber':''}">${S.queue.length}</div></div>
+    <div class="stat-box"><div class="stat-lbl">Doublons</div><div class="stat-val ${_dupGroups.length?'red':''}">${_dupGroups.length}</div></div>
+    <div class="stat-box"><div class="stat-lbl">Catégories</div><div class="stat-val">${S.categories.length}</div></div>`;
+}
+function fillCatFilter(selId){
+  const sel=document.getElementById(selId);const cur=sel.value;
+  while(sel.options.length>1)sel.remove(1);
+  S.categories.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
+  sel.value=cur;
+}
+function fillYearFilter(){
+  const sel=document.getElementById('lib-year');const cur=sel.value;
+  while(sel.options.length>1)sel.remove(1);
+  [...new Set(S.articles.map(a=>a.year).filter(Boolean))].sort((a,b)=>b-a).forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;sel.appendChild(o);});
+  sel.value=cur;
+}
+function renderBiblio(){
+  renderStats();fillCatFilter('lib-cat');fillYearFilter();
+  const q=(document.getElementById('lib-q').value||'').toLowerCase();
+  const catF=document.getElementById('lib-cat').value;
+  const yearF=document.getElementById('lib-year').value;
+  const sort=document.getElementById('lib-sort').value;
+  let arts=S.articles.filter(a=>{
+    if(catF&&!(a.cats||[]).includes(catF))return false;
+    if(yearF&&String(a.year)!==yearF)return false;
+    if(q){const hay=((a.title||'')+(a.authors||'')+(a.abstract||'')+(a.keywords||'')).toLowerCase();if(!hay.includes(q))return false;}
+    return true;
+  });
+  if(sort==='desc')arts.sort((a,b)=>(b.year||0)-(a.year||0));
+  else if(sort==='asc')arts.sort((a,b)=>(a.year||0)-(b.year||0));
+  else arts.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  document.getElementById('lib-count').textContent=`${arts.length} article${arts.length!==1?'s':''}`;
+  document.getElementById('biblio-list').innerHTML=arts.length?arts.map(cardHTML).join(''):`<div class="empty"><div class="empty-icon">📖</div><div class="empty-title">Aucun article</div><div style="font-size:13px">Importez vos références ou lancez une recherche PubMed.</div></div>`;
+}
+function renderCatPanel(catId){
+  const cat=S.categories.find(c=>c.id===catId);if(!cat)return;
+  const arts=S.articles.filter(a=>(a.cats||[]).includes(catId)).sort((a,b)=>(b.year||0)-(a.year||0));
+  document.getElementById('cat-content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;padding:11px 15px;background:${cat.color}12;border:1px solid ${cat.color}30;border-radius:var(--radius-lg)">
+      <span class="nav-dot" style="background:${cat.color};width:11px;height:11px"></span>
+      <div style="font-weight:500;color:${cat.color}">${cat.name}</div>
+      <div style="margin-left:auto;font-size:20px;font-weight:600;color:${cat.color}">${arts.length}</div>
+    </div>
+    ${arts.length?arts.map(cardHTML).join(''):`<div class="empty"><div class="empty-icon">📂</div><div class="empty-title">Aucun article dans cette catégorie</div></div>`}`;
+}
+
+// ════════════════════════════════
+// FILE DE VALIDATION
+// ════════════════════════════════
+function addToQueue(articles){
+  const keys=new Set([...S.articles.map(a=>a.pmid||a.id),...S.queue.map(a=>a.pmid||a.id),...S.rejected].filter(Boolean));
+  let added=0;
+  articles.forEach(a=>{const k=a.pmid||a.id;if(!keys.has(k)){const d=dupWith(a);a._dup=d?d.title:null;S.queue.push(a);keys.add(k);added++;}});
+  save();renderSidebar();return added;
+}
+function renderQueue(){
+  const q=S.queue;
+  const dc=q.filter(a=>a._dup).length;
+  document.getElementById('q-label').textContent=`${q.length} article${q.length!==1?'s':''} en attente${dc?` · ⚠️ ${dc} doublon(s) potentiel(s)`:''}`;
+  if(!q.length){document.getElementById('queue-list').innerHTML=`<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">File vide</div></div>`;return;}
+  document.getElementById('queue-list').innerHTML=q.map((a,i)=>`
+    <div class="v-card" style="${a._dup?'border-color:var(--red);border-left-color:var(--red)':''}">
+      ${a._dup?`<div style="font-size:11px;background:var(--red-bg);color:var(--red);border-radius:var(--radius);padding:5px 9px;margin-bottom:8px">⚠️ <strong>Doublon potentiel</strong> avec : <em>${a._dup.slice(0,80)}</em></div>`:''}
+      <div class="card-title-row">
+        <div class="card-title">${a.doi?`<a href="https://doi.org/${a.doi}" target="_blank">${a.title}</a>`:a.title}</div>
+      </div>
+      <div class="card-meta">
+        ${a.year?`<span class="meta-year">${a.year}</span><span class="meta-sep">·</span>`:''}
+        ${a.authors?`<span class="meta-authors">${a.authors}</span>`:''}
+        ${a.journal?`<span class="meta-sep">·</span><span class="meta-journal">${a.journal}</span>`:''}
+      </div>
+      ${a.abstract?`<div class="card-abstract">${a.abstract.slice(0,350)}${a.abstract.length>350?'…':''}</div>`:''}
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+        ${a.pdfUrl?`<button class="pdf-btn" onclick="openPdf('${a.pdfUrl.replace(/'/g,"\\'")}','${(a.title||'').replace(/'/g,"\\'").slice(0,60)}')">📄 PDF joint</button><button class="btn btn-sm btn-ghost" onclick="S.queue[${i}].pdfUrl=null;save();renderQueue()" style="color:var(--red);font-size:11px">✕</button>`
+          :`<label class="pdf-attach"><input type="file" accept=".pdf" onchange="S.queue[${i}].pdfUrl=URL.createObjectURL(this.files[0]);save();renderQueue()">📎 Joindre PDF</label>`}
+      </div>
+      <div class="v-cats">
+        <span style="font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap">Catégories :</span>
+        ${S.categories.map(cat=>{const on=(a.cats||[]).includes(cat.id);return`<label class="cat-check ${on?'on':''}" style="${on?`background:${cat.color};border-color:${cat.color}`:''}"><input type="checkbox" ${on?'checked':''} onchange="toggleQCat(${i},'${cat.id}',this)"><span class="tag-dot" style="background:${on?'#fff':cat.color}"></span>${cat.name}</label>`;}).join('')}
+      </div>
+      <div class="v-actions">
+        ${a._dup?`<span style="font-size:11px;color:var(--faint)">Vérifiez avant d'accepter</span>`:''}
+        <button class="btn btn-sm btn-danger" onclick="reject(${i})">✕ Rejeter</button>
+        <button class="btn btn-sm btn-success" onclick="accept(${i})">✓ Accepter</button>
+      </div>
+    </div>`).join('');
+}
+function toggleQCat(i,catId,cb){
+  const a=S.queue[i];if(!a)return;if(!a.cats)a.cats=[];
+  if(cb.checked){if(!a.cats.includes(catId))a.cats.push(catId);}else{a.cats=a.cats.filter(c=>c!==catId);}
+  const lbl=cb.closest('.cat-check');const cat=S.categories.find(c=>c.id===catId);
+  if(cb.checked){lbl.classList.add('on');lbl.style.background=cat.color;lbl.style.borderColor=cat.color;lbl.querySelector('.tag-dot').style.background='#fff';}
+  else{lbl.classList.remove('on');lbl.style.background='';lbl.style.borderColor='';lbl.querySelector('.tag-dot').style.background=cat.color;}
+  save();
+}
+function accept(i){const a=S.queue[i];if(!a)return;a.isNew=false;S.articles.push(a);S.queue.splice(i,1);save();renderQueue();renderSidebar();}
+function reject(i){const a=S.queue[i];if(!a)return;const k=a.pmid||a.id;if(k&&!S.rejected.includes(k))S.rejected.push(k);S.queue.splice(i,1);save();renderQueue();renderSidebar();}
+function acceptAll(){S.queue.forEach(a=>{a.isNew=false;S.articles.push(a);});S.queue=[];save();renderQueue();renderSidebar();renderBiblio();}
+function rejectAll(){if(!confirm(`Rejeter définitivement les ${S.queue.length} article(s) ?`))return;S.queue.forEach(a=>{const k=a.pmid||a.id;if(k&&!S.rejected.includes(k))S.rejected.push(k);});S.queue=[];save();renderQueue();renderSidebar();}
+function clearRejected(){if(!confirm(`Vider la liste noire (${S.rejected.length} articles) ?`))return;S.rejected=[];save();renderSidebar();}
+
+// ════════════════════════════════
+// AJOUT / ÉDITION ARTICLE
+// ════════════════════════════════
+let _editArtId=null;
+function openManual(){_editArtId=null;_artPdfUrl=null;clearArtModal();document.getElementById('art-modal-title').textContent='✏️ Ajouter une référence';renderArtCats([]);document.getElementById('modal-article').classList.add('open');}
+function openEdit(artId){
+  const a=S.articles.find(x=>x.id===artId);if(!a)return;
+  _editArtId=artId;_artPdfUrl=null;
+  document.getElementById('art-modal-title').textContent='✏️ Modifier la référence';
+  document.getElementById('art-id').value=a.id;
+  document.getElementById('art-title').value=a.title||'';
+  document.getElementById('art-authors').value=a.authors||'';
+  document.getElementById('art-year').value=a.year||'';
+  document.getElementById('art-journal').value=a.journal||'';
+  document.getElementById('art-doi').value=a.doi||'';
+  document.getElementById('art-pdf-url').value=a.pdfUrl&&!a.pdfUrl.startsWith('blob:')?a.pdfUrl:'';
+  document.getElementById('art-pdf-info').textContent=a.pdfUrl?'PDF actuellement lié':'';
+  document.getElementById('art-abstract').value=a.abstract||'';
+  document.getElementById('art-keywords').value=a.keywords||'';
+  renderArtCats(a.cats||[]);
+  document.getElementById('modal-article').classList.add('open');
+}
+function clearArtModal(){['art-id','art-title','art-authors','art-year','art-journal','art-doi','art-pdf-url','art-abstract','art-keywords'].forEach(id=>document.getElementById(id).value='');document.getElementById('art-pdf-info').textContent='';}
+function handleArtPdf(e){const f=e.target.files[0];if(!f)return;_artPdfUrl=URL.createObjectURL(f);document.getElementById('art-pdf-url').value='';document.getElementById('art-pdf-info').textContent='📄 '+f.name;}
+function renderArtCats(sel){
+  document.getElementById('art-cats').innerHTML=S.categories.map(cat=>{const on=sel.includes(cat.id);return`<label class="cat-check ${on?'on':''}" style="${on?`background:${cat.color};border-color:${cat.color}`:''}"><input type="checkbox" ${on?'checked':''} data-catid="${cat.id}" onchange="toggleArtCat('${cat.id}',this)"><span class="tag-dot" style="background:${on?'#fff':cat.color}"></span>${cat.name}</label>`;}).join('');
+}
+function toggleArtCat(catId,cb){const lbl=cb.closest('.cat-check');const cat=S.categories.find(c=>c.id===catId);if(cb.checked){lbl.classList.add('on');lbl.style.background=cat.color;lbl.style.borderColor=cat.color;lbl.querySelector('.tag-dot').style.background='#fff';}else{lbl.classList.remove('on');lbl.style.background='';lbl.style.borderColor='';lbl.querySelector('.tag-dot').style.background=cat.color;}}
+function autoClassifyModal(){const pseudo={title:document.getElementById('art-title').value,abstract:document.getElementById('art-abstract').value,keywords:document.getElementById('art-keywords').value};renderArtCats(classify(pseudo));}
+function saveArticleModal(){
+  const title=document.getElementById('art-title').value.trim();if(!title){alert('Le titre est obligatoire.');return;}
+  const cats=Array.from(document.querySelectorAll('#art-cats input:checked')).map(cb=>cb.getAttribute('data-catid')).filter(Boolean);
+  const manUrl=document.getElementById('art-pdf-url').value.trim();
+  const pdfUrl=_artPdfUrl||manUrl||null;
+  if(_editArtId){
+    const a=S.articles.find(x=>x.id===_editArtId);if(!a)return;
+    a.title=title;a.authors=document.getElementById('art-authors').value.trim();
+    a.year=parseInt(document.getElementById('art-year').value)||a.year;
+    a.journal=document.getElementById('art-journal').value.trim();
+    a.doi=document.getElementById('art-doi').value.trim();
+    a.abstract=document.getElementById('art-abstract').value.trim();
+    a.keywords=document.getElementById('art-keywords').value.trim();
+    a.cats=cats;if(pdfUrl)a.pdfUrl=pdfUrl;
+  }else{
+    S.articles.push({id:'man'+Date.now(),pmid:'',title,authors:document.getElementById('art-authors').value.trim(),journal:document.getElementById('art-journal').value.trim(),year:parseInt(document.getElementById('art-year').value)||new Date().getFullYear(),doi:document.getElementById('art-doi').value.trim(),pdfUrl,abstract:document.getElementById('art-abstract').value.trim(),keywords:document.getElementById('art-keywords').value.trim(),cats,isNew:false});
+  }
+  save();renderBiblio();renderSidebar();closeOverlay('modal-article');
+}
+
+// ════════════════════════════════
+// PDF VIEWER (PDF.js canvas)
+// ════════════════════════════════
+async function openPdf(url,title){
+  _pdfPage=1;_pdfZoom=1.2;_pdfDoc=null;
+  document.getElementById('pdf-title').textContent=title||'PDF';
+  document.getElementById('pdf-dl').href=url;
+  document.getElementById('pdf-dl').setAttribute('download',(title||'article').slice(0,60)+'.pdf');
+  document.getElementById('pdf-canvas').style.display='none';
+  document.getElementById('pdf-msg').style.display='block';
+  document.getElementById('pdf-msg').textContent='Chargement du PDF…';
+  document.getElementById('pdf-overlay').classList.add('open');
+  if(typeof pdfjsLib==='undefined'){document.getElementById('pdf-msg').textContent='PDF.js non disponible. Cliquez ⬇ pour télécharger.';return;}
+  try{
+    _pdfDoc=await pdfjsLib.getDocument(url).promise;
+    document.getElementById('pdf-msg').style.display='none';
+    document.getElementById('pdf-canvas').style.display='block';
+    await renderPdfPage();
+  }catch(e){document.getElementById('pdf-msg').textContent='Impossible d\'afficher ce PDF. Cliquez ⬇ pour télécharger.';}
+}
+async function renderPdfPage(){
+  if(!_pdfDoc)return;
+  const page=await _pdfDoc.getPage(_pdfPage);
+  const vp=page.getViewport({scale:_pdfZoom});
+  const c=document.getElementById('pdf-canvas');
+  c.width=vp.width;c.height=vp.height;
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+  document.getElementById('pdf-pages').textContent=`${_pdfPage} / ${_pdfDoc.numPages}`;
+}
+async function pdfPage(d){if(!_pdfDoc)return;const n=_pdfPage+d;if(n<1||n>_pdfDoc.numPages)return;_pdfPage=n;await renderPdfPage();}
+async function pdfZoom(d){if(!_pdfDoc)return;_pdfZoom=Math.max(0.4,Math.min(3,_pdfZoom+d));await renderPdfPage();}
+function closePdf(){document.getElementById('pdf-overlay').classList.remove('open');_pdfDoc=null;}
+
+// ════════════════════════════════
+// PUBMED
+// ════════════════════════════════
+function setQ(q){document.getElementById('pm-q').value=q;}
+async function doPubmed(){
+  const q=document.getElementById('pm-q').value.trim();const y=parseInt(document.getElementById('pm-years').value)||2;
+  if(!q){alert('Entrez un terme.');return;}
+  const c=document.getElementById('pm-results');c.innerHTML=`<div class="spin-wrap"><div class="spin"></div>Connexion à PubMed…</div>`;
+  try{
+    const min=new Date().getFullYear()-y;
+    const r=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(q)}[Title/Abstract]&mindate=${min}&maxdate=3000&retmax=15&retmode=json`);
+    const d=await r.json();const ids=d.esearchresult?.idlist||[];
+    if(!ids.length){c.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Aucun résultat</div></div>`;return;}
+    c.innerHTML=`<div class="spin-wrap"><div class="spin"></div>Récupération de ${ids.length} articles…</div>`;
+    const r2=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${ids.join(',')}&rettype=xml&retmode=xml`);
+    const xml=await r2.text();const doc=new DOMParser().parseFromString(xml,'text/xml');
+    const exKeys=new Set([...S.articles.map(a=>a.pmid),...S.queue.map(a=>a.pmid)].filter(Boolean));
+    const arts=[];
+    doc.querySelectorAll('PubmedArticle').forEach(node=>{
+      const pmid=node.querySelector('PMID')?.textContent||'';
+      const title=node.querySelector('ArticleTitle')?.textContent||'';if(!title)return;
+      const abs=Array.from(node.querySelectorAll('AbstractText')).map(n=>n.textContent).join(' ');
+      const yr=node.querySelector('PubDate Year')?.textContent||node.querySelector('PubDate MedlineDate')?.textContent?.slice(0,4)||'';
+      const journal=node.querySelector('Journal Title')?.textContent||'';
+      const auN=Array.from(node.querySelectorAll('Author')).slice(0,4);
+      const authors=auN.map(au=>(au.querySelector('LastName')?.textContent||'')+(au.querySelector('Initials')?.textContent?' '+au.querySelector('Initials').textContent:'')).join(', ')+(auN.length>=4?' et al.':'');
+      const doi=Array.from(node.querySelectorAll('ArticleId')).find(x=>x.getAttribute('IdType')==='doi')?.textContent||'';
+      const kw=Array.from(node.querySelectorAll('Keyword')).map(k=>k.textContent).join(', ');
+      const art={id:'pm'+Date.now()+pmid,pmid,title,authors,journal,year:parseInt(yr)||new Date().getFullYear(),doi,abstract:abs,keywords:kw,cats:[],pdfUrl:null,_already:exKeys.has(pmid)||S.articles.some(a=>norm(a.title)===norm(title))};
+      art.cats=classify(art);arts.push(art);
+    });
+    const nc=arts.filter(a=>!a._already).length;
+    c.innerHTML=`<div class="alert alert-success">✅ ${arts.length} article(s) · ${nc} nouveaux</div>`+arts.map(a=>`
+      <div class="card" style="${a._already?'opacity:.5':''}">
+        <div class="card-title">${a.doi?`<a href="https://doi.org/${a.doi}" target="_blank">${a.title}</a>`:a.title}${a._already?`<span class="tag" style="background:var(--surface2);color:var(--faint);border:1px solid var(--border);font-size:10px;margin-left:5px">Déjà importé</span>`:''}</div>
+        <div class="card-meta">${a.year?`<span class="meta-year">${a.year}</span><span class="meta-sep">·</span>`:''} ${a.authors?`<span class="meta-authors">${a.authors}</span>`:''} ${a.journal?`<span class="meta-sep">·</span><span class="meta-journal">${a.journal}</span>`:''}</div>
+        ${a.abstract?`<div class="card-abstract">${a.abstract.slice(0,300)}${a.abstract.length>300?'…':''}</div>`:''}
+        <div class="card-footer">${(a.cats||[]).map(c=>tagHTML(c)).join('')}<span style="font-size:10px;background:#EEE8F8;color:#5B3D8C;padding:2px 6px;border-radius:10px">🤖 IA</span>${!a._already?`<button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="sendQ(this,'${encodeURIComponent(JSON.stringify(a))}')">→ Valider</button>`:''}</div>
+      </div>`).join('');
+  }catch(e){c.innerHTML=`<div class="alert alert-error">⚠️ Erreur PubMed. Vérifiez votre connexion.</div>`;}
+}
+function sendQ(btn,enc){const art=JSON.parse(decodeURIComponent(enc));delete art._already;art.id='pm'+Date.now()+Math.random().toString(36).slice(2,6);const n=addToQueue([art]);btn.textContent=n?'✓ En file':'Déjà en file';btn.disabled=true;btn.style.opacity='.6';}
+
+// ════════════════════════════════
+// VEILLE
+// ════════════════════════════════
+async function runVeille(){
+  const active=S.watches.filter(w=>w.on);if(!active.length){alert('Aucune alerte active.');return;}
+  const btn=document.getElementById('sync-btn');btn.textContent='⏳ En cours…';btn.disabled=true;
+  const ex=new Set([...S.articles.map(a=>a.pmid),...S.queue.map(a=>a.pmid),...S.rejected].filter(Boolean));
+  const min=new Date().getFullYear()-1;const newArts=[];
+  for(const w of active){
+    try{
+      const r=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(w.q)}[Title/Abstract]&mindate=${min}&maxdate=3000&retmax=8&retmode=json`);
+      const d=await r.json();const ids=(d.esearchresult?.idlist||[]).filter(id=>!ex.has(id));if(!ids.length)continue;
+      const r2=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${ids.join(',')}&rettype=xml&retmode=xml`);
+      const xml=await r2.text();const doc=new DOMParser().parseFromString(xml,'text/xml');
+      doc.querySelectorAll('PubmedArticle').forEach(node=>{
+        const pmid=node.querySelector('PMID')?.textContent||'';if(ex.has(pmid))return;
+        const title=node.querySelector('ArticleTitle')?.textContent||'';if(!title)return;
+        const abs=Array.from(node.querySelectorAll('AbstractText')).map(n=>n.textContent).join(' ');
+        const yr=node.querySelector('PubDate Year')?.textContent||new Date().getFullYear().toString();
+        const journal=node.querySelector('Journal Title')?.textContent||'';
+        const authors=Array.from(node.querySelectorAll('Author')).slice(0,3).map(au=>(au.querySelector('LastName')?.textContent||'')+(au.querySelector('Initials')?.textContent?' '+au.querySelector('Initials').textContent:'')).join(', ');
+        const doi=Array.from(node.querySelectorAll('ArticleId')).find(x=>x.getAttribute('IdType')==='doi')?.textContent||'';
+        const art={id:'v'+Date.now()+pmid,pmid,title,authors,journal,year:parseInt(yr)||new Date().getFullYear(),doi,abstract:abs,keywords:'',cats:[],pdfUrl:null};
+        art.cats=classify(art);newArts.push(art);ex.add(pmid);
+      });
+    }catch(e){}
+  }
+  const added=addToQueue(newArts);
+  S.lastSync=new Date().toLocaleDateString('fr-FR')+' '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  save();btn.textContent='🔄 Actualiser veille';btn.disabled=false;renderSidebar();
+  alert(added?`✅ ${added} nouvel(s) article(s) → vérifiez « À valider »`:'✓ À jour. Aucun nouvel article.');
+}
+function renderWatches(){
+  const rc=document.getElementById('rejected-count');if(rc)rc.textContent=S.rejected.length?`${S.rejected.length} article(s) dans la liste noire.`:'Liste noire vide.';
+  document.getElementById('watches-list').innerHTML=S.watches.map(w=>`
+    <div class="watch-row">
+      <div class="watch-info"><div class="watch-name">${w.name}</div><div class="watch-q">${w.q}</div></div>
+      <button class="btn btn-sm btn-ghost" onclick="delWatch('${w.id}')" style="color:var(--red)">🗑</button>
+      <button class="toggle ${w.on?'on':''}" onclick="togWatch('${w.id}')"></button>
+    </div>`).join('');
+}
+function togWatch(id){const w=S.watches.find(x=>x.id===id);if(w){w.on=!w.on;save();renderWatches();}}
+function delWatch(id){S.watches=S.watches.filter(x=>x.id!==id);save();renderWatches();}
+function openAddWatch(){document.getElementById('modal-watch').classList.add('open');}
+function saveWatch(){
+  const name=document.getElementById('w-name').value.trim();const q=document.getElementById('w-query').value.trim();
+  if(!name||!q){alert('Remplissez le nom et la requête.');return;}
+  S.watches.push({id:'w'+Date.now(),name,q,on:true});save();closeOverlay('modal-watch');renderWatches();
+  document.getElementById('w-name').value='';document.getElementById('w-query').value='';
+}
+
+// ════════════════════════════════
+// IMPORT
+// ════════════════════════════════
+function dzOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('over');}
+function dzLeave(){document.getElementById('drop-zone').classList.remove('over');}
+function dzDrop(e){e.preventDefault();dzLeave();handleFiles(Array.from(e.dataTransfer.files));}
+function handleFiles(files){
+  if(!files||!files.length)return;
+  const pdfs=files.filter(f=>f&&f.name.toLowerCase().endsWith('.pdf'));
+  const others=files.filter(f=>f&&!f.name.toLowerCase().endsWith('.pdf'));
+  let total=0;
+  Promise.all(others.map(f=>new Promise(res=>{
+    if(!f){res();return;}
+    const r=new FileReader();
+    r.onload=ev=>{
+      const txt=ev.target.result;const n=f.name.toLowerCase();let arts=[];
+      if(n.endsWith('.bib')||txt.includes('@article')||txt.includes('@Article'))arts=parseBib(txt);
+      else if(n.endsWith('.ris')||txt.match(/^TY\s*-/m))arts=parseRis(txt);
+      else if(n.endsWith('.json')){try{const d=JSON.parse(txt);if(d.articles)arts=d.articles;}catch(e){}}
+      arts.forEach(a=>{a.cats=classify(a);a.id=a.id||'imp'+Date.now()+Math.random().toString(36).slice(2,6);a.pdfUrl=a.pdfUrl||null;});
+      total+=addToQueue(arts);res();
+    };
+    r.readAsText(f);
+  }))).then(async()=>{
+    if(pdfs.length)await handlePdfs(pdfs);
+    if(total>0)alert(`✅ ${total} article(s) → vérifiez « À valider »`);
+    else if(!pdfs.length)alert('Aucun nouvel article (déjà importés ou format non reconnu).');
+    renderSidebar();
+  });
+}
+async function handlePdfs(files){
+  const p=document.getElementById('pdf-progress');p.style.display='block';
+  let ok=0,fail=0;
+  for(let i=0;i<files.length;i++){
+    p.innerHTML=`<div class="spin-wrap"><div class="spin"></div>PDF ${i+1}/${files.length} : ${files[i].name}…</div>`;
+    try{
+      const art=await extractPdf(files[i]);
+      if(art){art.cats=classify(art);art.id='pdf'+Date.now()+Math.random().toString(36).slice(2,6);art.pdfUrl=URL.createObjectURL(files[i]);ok+=addToQueue([art]);}
+      else fail++;
+    }catch(e){fail++;}
+  }
+  p.innerHTML=`<div class="alert ${ok?'alert-success':'alert-warn'}">📄 ${ok} PDF traité(s)${fail?` · ${fail} non identifié(s)`:''}</div>`;
+  setTimeout(()=>{p.style.display='none';},7000);
+}
+async function extractPdf(file){
+  if(typeof pdfjsLib==='undefined')throw new Error('PDF.js non chargé');
+  const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let metaTitle='';try{const m=await pdf.getMetadata();metaTitle=m?.info?.Title||'';}catch(e){}
+  let text='';
+  for(let pg=1;pg<=Math.min(2,pdf.numPages);pg++){const page=await pdf.getPage(pg);const ct=await page.getTextContent();text+=ct.items.map(it=>it.str).join(' ')+'\n';}
+  const dm=text.match(/10\.\d{4,9}\/[-._;()\/:A-Za-z0-9]+/);
+  const doi=dm?dm[0].replace(/[.,;)>]$/,''):'';
+  const gt=(metaTitle&&metaTitle.length>15&&!/microsoft word|\.pdf|untitled/i.test(metaTitle))?metaTitle:guessTitle(text);
+  let res=null;
+  if(doi)res=await crDoi(doi);
+  if(!res&&gt)res=await crTitle(gt);
+  if(res)return res;
+  if(gt)return{title:gt,authors:'',journal:'',year:guessYear(text),doi,abstract:guessAbs(text),keywords:'',pmid:'',cats:[]};
+  return null;
+}
+function guessTitle(t){const lines=t.split(/\n|(?<=[a-z])\s{2,}(?=[A-Z])/).map(l=>l.trim()).filter(Boolean);for(const l of lines.slice(0,15)){if(l.length>20&&l.length<260&&!/^(doi|issn|vol\.|page|©|received|accepted|www\.|http)/i.test(l)&&/[a-z]/.test(l))return l;}return'';}
+function guessYear(t){const m=t.match(/\b(19|20)\d{2}\b/);return m?parseInt(m[0]):new Date().getFullYear();}
+function guessAbs(t){const m=t.match(/abstract[:\s]+([\s\S]{50,1200}?)(?:keywords|introduction|\n\n)/i);return m?m[1].trim().slice(0,800):'';}
+async function crDoi(doi){try{const r=await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`);if(!r.ok)return null;return crItem((await r.json()).message);}catch(e){return null;}}
+async function crTitle(t){try{const r=await fetch(`https://api.crossref.org/works?query.bibliographic=${encodeURIComponent(t)}&rows=1`);if(!r.ok)return null;return crItem((await r.json()).message?.items?.[0]);}catch(e){return null;}}
+function crItem(item){
+  if(!item||!item.title)return null;
+  const authors=(item.author||[]).slice(0,4).map(a=>`${a.family||''}${a.given?' '+a.given[0]+'.':''}`).join(', ')+((item.author||[]).length>4?' et al.':'');
+  const year=item['published-print']?.['date-parts']?.[0]?.[0]||item['published-online']?.['date-parts']?.[0]?.[0]||item.created?.['date-parts']?.[0]?.[0]||'';
+  return{title:item.title[0],authors,journal:item['container-title']?.[0]||'',year:parseInt(year)||new Date().getFullYear(),doi:item.DOI||'',abstract:(item.abstract||'').replace(/<[^>]+>/g,'').trim(),keywords:(item.subject||[]).join(', '),pmid:'',cats:[]};
+}
+function parseBib(txt){
+  const entries=[];const re=/@(\w+)\s*\{([^,]+),([\s\S]*?)(?=\n@|\s*$)/gi;let m;
+  while((m=re.exec(txt))!==null){
+    const t=m[1].toLowerCase();if(['string','preamble','comment'].includes(t))continue;
+    const f={};const fr=/(\w+)\s*=\s*(?:\{((?:[^{}]|\{[^{}]*\})*)\}|"([^"]*)"|([\w\d]+))/gi;let fm;
+    while((fm=fr.exec(m[3]))!==null)f[fm[1].toLowerCase()]=(fm[2]||fm[3]||fm[4]||'').replace(/[{}]/g,'').trim();
+    const title=f.title||'';if(!title)continue;
+    entries.push({id:'bib'+Date.now()+Math.random().toString(36).slice(2,6),pmid:'',title,authors:(f.author||'').replace(/\s+and\s+/gi,' · '),journal:f.journal||f.booktitle||'',year:parseInt(f.year)||0,doi:f.doi||'',abstract:f.abstract||'',keywords:f.keywords||'',cats:[],pdfUrl:null});
+  }
+  return entries;
+}
+function parseRis(txt){
+  const entries=[];
+  txt.split(/\nER\s*-/).filter(b=>b.trim()).forEach(block=>{
+    const f={};const authors=[];
+    block.split('\n').forEach(line=>{const m=line.match(/^([A-Z][A-Z0-9])\s{1,2}-\s+(.*)/);if(!m)return;const[,tag,val]=m;const v=val.trim();if(tag==='AU'||tag==='A1')authors.push(v);else f[tag]=v;});
+    const title=f['TI']||f['T1']||'';if(!title)return;
+    entries.push({id:'ris'+Date.now()+Math.random().toString(36).slice(2,6),pmid:f['AN']||'',title,authors:authors.slice(0,4).join(', ')+(authors.length>4?' et al.':''),journal:f['JO']||f['JF']||f['T2']||'',year:parseInt(f['PY']||f['Y1']||'')||0,doi:f['DO']||'',abstract:f['AB']||f['N2']||'',keywords:f['KW']||'',cats:[],pdfUrl:null});
+  });
+  return entries;
+}
+function importJSON(event){
+  const file=event.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);let added=0;
+      if(d.articles){const ex=new Set(S.articles.map(a=>a.id));d.articles.forEach(a=>{if(!ex.has(a.id)){S.articles.push(a);added++;}});}
+      if(d.categories){const ec=new Set(S.categories.map(c=>c.id));d.categories.forEach(c=>{if(!ec.has(c.id))S.categories.push(c);});}
+      if(d.watches){const ew=new Set(S.watches.map(w=>w.id));d.watches.forEach(w=>{if(!ew.has(w.id))S.watches.push(w);});}
+      if(d.queue){const eq=new Set([...S.articles.map(a=>a.id),...S.queue.map(a=>a.id)]);d.queue.forEach(a=>{if(!eq.has(a.id)){S.queue.push(a);added++;}});}
+      if(d.rejected)d.rejected.forEach(r=>{if(!S.rejected.includes(r))S.rejected.push(r);});
+      save();renderSidebar();renderBiblio();
+      document.getElementById('json-status').textContent=`✓ ${added} élément(s) restauré(s)`;
+    }catch(e){document.getElementById('json-status').textContent='⚠️ Fichier invalide';}
+  };
+  r.readAsText(file);
+}
+
+// ════════════════════════════════
+// CATÉGORIES
+// ════════════════════════════════
+function renderCats(){
+  const counts=getCatCounts();
+  document.getElementById('cats-mgr').innerHTML=S.categories.map((cat,idx)=>{
+    if(_editCatId===cat.id){return`<div class="cat-row" style="flex-direction:column;align-items:stretch;gap:7px;padding:13px;cursor:default">
+      <div style="display:flex;gap:7px;align-items:center">
+        <span class="swatch" style="background:${cat.color}"></span>
+        <input type="text" class="inp" id="ec-name" value="${cat.name.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" style="flex:1;width:auto">
+        <select class="sel" id="ec-color">
+          ${['#2E5C4F','#1A6B72','#7B4F2E','#1E5FA6','#B8680A','#5B3D8C','#C0392B','#6B6560','#1A5C3F','#8B6914','#336B87','#A0522D','#2E7D6B','#4A7C9E','#8E3A59'].map(c=>`<option value="${c}" ${cat.color===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <textarea class="inp" id="ec-kw" style="min-height:55px;resize:vertical;font-size:12px;font-family:monospace">${(cat.kw||cat.keywords||[]).join(', ')}</textarea>
+      <div style="display:flex;gap:7px;justify-content:flex-end">
+        <button class="btn btn-sm" onclick="_editCatId=null;renderCats()">Annuler</button>
+        <button class="btn btn-sm btn-primary" onclick="saveCatEdit('${cat.id}')">✓ Enregistrer</button>
+      </div>
+    </div>`;}
+    return`<div class="cat-row" draggable="true" data-id="${cat.id}" ondragstart="cdStart(event)" ondragover="cdOver(event)" ondrop="cdDrop(event)" ondragend="cdEnd(event)">
+      <span style="color:var(--faint);font-size:13px">⠿</span>
+      <span class="swatch" style="background:${cat.color}"></span>
+      <span class="cat-row-name">${cat.name}</span>
+      <span class="cat-row-kw">${(cat.kw||cat.keywords||[]).slice(0,5).join(', ')}…</span>
+      <span class="cat-row-count">${counts[cat.id]||0} art.</span>
+      <button class="btn btn-sm btn-ghost" onclick="moveCat(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+      <button class="btn btn-sm btn-ghost" onclick="moveCat(${idx},1)" ${idx===S.categories.length-1?'disabled':''}>↓</button>
+      <button class="btn btn-sm btn-ghost" onclick="_editCatId='${cat.id}';renderCats()">✏️</button>
+      <button class="btn btn-sm btn-ghost" onclick="delCat('${cat.id}')" style="color:var(--red)">🗑</button>
+    </div>`;
+  }).join('');
+}
+function moveCat(idx,d){const n=idx+d;if(n<0||n>=S.categories.length)return;[S.categories[idx],S.categories[n]]=[S.categories[n],S.categories[idx]];save();renderCats();renderSidebar();}
+function cdStart(e){_dragCatId=e.currentTarget.getAttribute('data-id');e.currentTarget.style.opacity='.4';}
+function cdOver(e){e.preventDefault();}
+function cdEnd(e){e.currentTarget.style.opacity='1';}
+function cdDrop(e){
+  e.preventDefault();const tid=e.currentTarget.getAttribute('data-id');if(!_dragCatId||_dragCatId===tid)return;
+  const fi=S.categories.findIndex(c=>c.id===_dragCatId);const ti=S.categories.findIndex(c=>c.id===tid);if(fi<0||ti<0)return;
+  const[mv]=S.categories.splice(fi,1);S.categories.splice(ti,0,mv);_dragCatId=null;save();renderCats();renderSidebar();
+}
+function saveCatEdit(id){
+  const cat=S.categories.find(c=>c.id===id);if(!cat)return;
+  const name=document.getElementById('ec-name').value.trim();if(!name){alert('Le nom est obligatoire.');return;}
+  cat.name=name;cat.color=document.getElementById('ec-color').value;
+  const kwStr=document.getElementById('ec-kw').value.trim();
+  const kw=kwStr?kwStr.split(',').map(k=>k.trim()).filter(Boolean):[name.toLowerCase()];
+  cat.kw=kw;cat.keywords=kw;
+  _editCatId=null;save();renderCats();renderSidebar();renderBiblio();
+}
+function addCat(){
+  const name=document.getElementById('new-cat-name').value.trim();const kwStr=document.getElementById('new-cat-kw').value.trim();const color=document.getElementById('new-cat-color').value;
+  if(!name){alert('Entrez un nom.');return;}
+  const kw=kwStr?kwStr.split(',').map(k=>k.trim()).filter(Boolean):[name.toLowerCase()];
+  S.categories.push({id:'c'+Date.now(),name,color,kw,keywords:kw,desc:name});
+  document.getElementById('new-cat-name').value='';document.getElementById('new-cat-kw').value='';
+  save();renderCats();renderSidebar();
+}
+function delCat(id){
+  if(!confirm('Supprimer cette catégorie ?'))return;
+  S.categories=S.categories.filter(c=>c.id!==id);
+  S.articles.forEach(a=>{a.cats=(a.cats||[]).filter(c=>c!==id);});
+  S.queue.forEach(a=>{a.cats=(a.cats||[]).filter(c=>c!==id);});
+  save();renderCats();renderSidebar();
+}
+
+// ════════════════════════════════
+// EXPORT
+// ════════════════════════════════
+function fillExportSelects(){
+  ['exp-bib-cat','exp-csv-cat'].forEach(id=>{
+    const sel=document.getElementById(id);while(sel.options.length>1)sel.remove(1);
+    S.categories.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
+  });
+}
+function getExp(selId){const cid=document.getElementById(selId).value;return cid?S.articles.filter(a=>(a.cats||[]).includes(cid)):S.articles;}
+function san(s){return(s||'').replace(/[{}\\]/g,'');}
+function exportBib(){
+  const arts=getExp('exp-bib-cat');
+  const bib=arts.map((a,i)=>{
+    const key=((a.authors||'Unknown').split(/,|·/)[0].trim().replace(/\s/g,'').replace(/[^a-zA-Z]/g,'')||'Author')+(a.year||'');
+    const cats=(a.cats||[]).map(c=>S.categories.find(x=>x.id===c)?.name||'').filter(Boolean).join('; ');
+    return`@article{${key}${i},\n  title={${san(a.title)}},\n  author={${san(a.authors)}},\n  journal={${san(a.journal)}},\n  year={${a.year||''}},\n  doi={${san(a.doi)}},\n  abstract={${san(a.abstract)}},\n  keywords={${san(cats)}}\n}`;
+  }).join('\n\n');
+  dl('oenomicro_export.bib',bib,'text/plain');
+}
+function exportCSV(){
+  const arts=getExp('exp-csv-cat');
+  const hdr='Titre,Auteurs,Journal,Année,DOI,PMID,Catégories,Résumé';
+  const rows=arts.map(a=>{const cats=(a.cats||[]).map(c=>S.categories.find(x=>x.id===c)?.name||'').filter(Boolean).join('; ');return[a.title,a.authors,a.journal,a.year,a.doi||'',a.pmid||'',cats,(a.abstract||'').replace(/\n/g,' ')].map(f=>`"${String(f||'').replace(/"/g,'""')}"`).join(',');});
+  dl('oenomicro_export.csv',[hdr,...rows].join('\n'),'text/csv;charset=utf-8');
+}
+function exportJSON(){dl('oenomicro_backup.json',JSON.stringify(S,null,2),'application/json');}
+function dl(fn,content,type){const blob=new Blob(['\uFEFF'+content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+
+// ════════════════════════════════
+// UTILS
+// ════════════════════════════════
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+
+// INIT
+renderSidebar();renderBiblio();
+</script>
+</body>
+</html>
