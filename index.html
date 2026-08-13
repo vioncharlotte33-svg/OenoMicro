@@ -388,28 +388,6 @@ input[type=file]{display:none}
   </div>
 </main>
 
-<!-- PDF VIEWER -->
-<div class="pdf-overlay" id="pdf-overlay" onclick="if(event.target===this)closePdf()">
-  <div class="pdf-wrap">
-    <div class="pdf-top">
-      <div class="pdf-title" id="pdf-title">PDF</div>
-      <div class="pdf-controls">
-        <button class="btn btn-sm btn-ghost" onclick="pdfPage(-1)">◀</button>
-        <span id="pdf-pages" style="font-size:12px;color:var(--muted);white-space:nowrap">1 / 1</span>
-        <button class="btn btn-sm btn-ghost" onclick="pdfPage(1)">▶</button>
-        <button class="btn btn-sm btn-ghost" onclick="pdfZoom(-0.25)">−</button>
-        <button class="btn btn-sm btn-ghost" onclick="pdfZoom(0.25)">+</button>
-        <a id="pdf-dl" href="#" class="btn btn-sm">⬇</a>
-        <button class="btn btn-sm btn-ghost" onclick="closePdf()">✕</button>
-      </div>
-    </div>
-    <div class="pdf-body" id="pdf-body">
-      <div id="pdf-msg" style="color:#fff;align-self:center;font-size:13px">Chargement…</div>
-      <canvas id="pdf-canvas" style="display:none;box-shadow:0 2px 12px rgba(0,0,0,.5)"></canvas>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL: Ajout / Édition article -->
 <div class="overlay" id="modal-article">
   <div class="modal">
@@ -459,7 +437,6 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -927,35 +904,9 @@ function saveArticleModal(){
 // ════════════════════════════════
 // PDF VIEWER (PDF.js canvas)
 // ════════════════════════════════
-async function openPdf(url,title){
-  _pdfPage=1;_pdfZoom=1.2;_pdfDoc=null;
-  document.getElementById('pdf-title').textContent=title||'PDF';
-  document.getElementById('pdf-dl').href=url;
-  document.getElementById('pdf-dl').setAttribute('download',(title||'article').slice(0,60)+'.pdf');
-  document.getElementById('pdf-canvas').style.display='none';
-  document.getElementById('pdf-msg').style.display='block';
-  document.getElementById('pdf-msg').textContent='Chargement du PDF…';
-  document.getElementById('pdf-overlay').classList.add('open');
-  if(typeof pdfjsLib==='undefined'){document.getElementById('pdf-msg').textContent='PDF.js non disponible. Cliquez ⬇ pour télécharger.';return;}
-  try{
-    _pdfDoc=await pdfjsLib.getDocument(url).promise;
-    document.getElementById('pdf-msg').style.display='none';
-    document.getElementById('pdf-canvas').style.display='block';
-    await renderPdfPage();
-  }catch(e){document.getElementById('pdf-msg').textContent='Impossible d\'afficher ce PDF. Cliquez ⬇ pour télécharger.';}
+function openPdf(url, title){
+  window.open(url, '_blank');
 }
-async function renderPdfPage(){
-  if(!_pdfDoc)return;
-  const page=await _pdfDoc.getPage(_pdfPage);
-  const vp=page.getViewport({scale:_pdfZoom});
-  const c=document.getElementById('pdf-canvas');
-  c.width=vp.width;c.height=vp.height;
-  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
-  document.getElementById('pdf-pages').textContent=`${_pdfPage} / ${_pdfDoc.numPages}`;
-}
-async function pdfPage(d){if(!_pdfDoc)return;const n=_pdfPage+d;if(n<1||n>_pdfDoc.numPages)return;_pdfPage=n;await renderPdfPage();}
-async function pdfZoom(d){if(!_pdfDoc)return;_pdfZoom=Math.max(0.4,Math.min(3,_pdfZoom+d));await renderPdfPage();}
-function closePdf(){document.getElementById('pdf-overlay').classList.remove('open');_pdfDoc=null;}
 
 // ════════════════════════════════
 // PUBMED
