@@ -719,11 +719,12 @@ function addCatToArt(artId,catId){
   if(a){if(!a.cats)a.cats=[];if(!a.cats.includes(catId))a.cats.push(catId);save();renderBiblio();renderSidebar();}
 }
 function promptPdfLink(artId){
-  const url=prompt('Collez le lien de partage OneDrive du PDF :\n\n(Sur OneDrive web : clic droit sur le PDF → Partager → Copier le lien)');
-  if(!url||!url.trim())return;
+  const raw=prompt('Collez le lien de partage OneDrive du PDF :\n\n(Sur OneDrive web : clic droit sur le PDF → Partager → Copier le lien)');
+  if(!raw||!raw.trim())return;
+  const url=fixOneDriveUrl(raw.trim());
   if(!url.startsWith('http')){alert('Le lien doit commencer par https://');return;}
   const a=S.articles.find(x=>x.id===artId);
-  if(a){a.pdfUrl=url.trim();save();renderBiblio();}
+  if(a){a.pdfUrl=url;save();renderBiblio();}
 }
 
 function attachPdf(artId,input){
@@ -838,10 +839,22 @@ function renderQueue(){
       </div>
     </div>`).join('');
 }
+function fixOneDriveUrl(url){
+  if(!url) return url;
+  url = url.trim();
+  // SharePoint/OneDrive share links → direct download
+  if(url.includes('sharepoint.com') || url.includes('onedrive.live.com') || url.includes('1drv.ms')){
+    // Remove existing query params and add download=1
+    const base = url.split('?')[0];
+    return base + '?download=1';
+  }
+  return url;
+}
+
 function linkOneDrivePdf(i){
   const input=document.getElementById('pdf-url-'+i);
   if(!input)return;
-  const url=input.value.trim();
+  const url=fixOneDriveUrl(input.value.trim());
   if(!url){alert('Collez d\'abord le lien OneDrive.');return;}
   if(!url.startsWith('http')){alert('Le lien doit commencer par https://');return;}
   S.queue[i].pdfUrl=url;
@@ -894,7 +907,7 @@ function autoClassifyModal(){const pseudo={title:document.getElementById('art-ti
 function saveArticleModal(){
   const title=document.getElementById('art-title').value.trim();if(!title){alert('Le titre est obligatoire.');return;}
   const cats=Array.from(document.querySelectorAll('#art-cats input:checked')).map(cb=>cb.getAttribute('data-catid')).filter(Boolean);
-  const manUrl=document.getElementById('art-pdf-url').value.trim();
+  const manUrl=fixOneDriveUrl(document.getElementById('art-pdf-url').value.trim());
   const pdfUrl=_artPdfUrl||manUrl||null;
   if(_editArtId){
     const a=S.articles.find(x=>x.id===_editArtId);if(!a)return;
